@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFC - Ikhsan Fried Chicken</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .phone-container {
+            width: 100%;
+            max-width: 420px;
+            background-color: #f9f9f9;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            position: relative;
+            min-height: 90vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(to bottom, #004e92, #000428);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #00c6ff;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header img.logo-ifc {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #00c6ff;
+            object-fit: cover;
+        }
+        .header-text h1 {
+            color: #00c6ff;
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-align: left;
+        }
+        .header-text p {
+            color: #fff;
+            font-size: 11px;
+            margin: 3px 0 0 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: left;
+        }
+
+        /* Navigasi Halaman */
+        .view {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .view.active {
+            display: flex;
+        }
+
+        /* Konten Menu */
+        .menu-section {
+            padding: 20px;
+            background-color: #fff;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+        .menu-title {
+            color: #000428;
+            border-left: 5px solid #00c6ff;
+            padding-left: 10px;
+            margin: 20px 0 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .menu-title:first-child { margin-top: 0; }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f1f8ff;
+            border-radius: 10px;
+            border: 1px solid #e1e1e1;
+        }
+        .menu-item .details h3 {
+            margin: 0 0 5px 0;
+            color: #000428;
+            font-size: 16px;
+        }
+        .menu-item .details p {
+            margin: 0;
+            color: #666;
+            font-size: 12px;
+        }
+        .menu-item .right-content { text-align: right; }
+        .menu-item .price {
+            font-weight: bold;
+            color: #0072ff;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .order-btn {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .order-btn:active { transform: scale(0.95); }
+
+        /* Tombol Keranjang */
+        .cart-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #000428;
+            color: white;
+            padding: 15px 20px;
+            box-sizing: border-box;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-top: 4px solid #00c6ff;
+        }
+        .cart-footer.show { display: flex; }
+
+        /* Halaman Pembayaran */
+        .payment-section {
+            padding: 20px;
+            flex-grow: 1;
+            background-color: #fff;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #00c6ff;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+        }
+        .summary-box {
+            background: #f1f8ff;
+            border: 1px solid #d1e8ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+        .summary-total {
+            border-top: 2px dashed #0072ff;
+            margin-top: 10px;
+            padding-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #000428;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Logo Pembayaran */
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .payment-option {
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            background: #fff;
+        }
+        .payment-option.selected {
+            border-color: #0072ff;
+            background: #e1f0ff;
+            box-shadow: 0 0 10px rgba(0, 114, 255, 0.2);
+        }
+        .payment-option img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .pay-btn {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        /* Halaman Proses Bayar (QRIS / VA) */
+        .process-section {
+            padding: 20px;
+            text-align: center;
+            background: #fff;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .process-logo {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+        .qr-box {
+            background: #fff;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .qr-box img {
+            width: 200px;
+            height: 200px;
+        }
+        .va-box {
+            background: #f1f8ff;
+            border: 1px dashed #0072ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .va-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: #000428;
+            letter-spacing: 1px;
+            margin: 10px 0;
+        }
+        .copy-btn {
+            background: #000428;
+            color: #fff;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .timer {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        /* Notifikasi Toast */
+        .toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 10px;
+            padding: 12px;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 1.5s;
+        }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 100px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 100px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        
+        <!-- HALAMAN 1: MENU -->
+        <div id="menuView" class="view active">
+            <div class="header">
+                <img class="logo-ifc" src="https://z-cdn-media.chatglm.cn/files/664e07b0-8828-4f15-b1ea-af9f36587989.png?auth_key=1889798300-51a4e049aabd462e847099375a03e485-0-52b1a636d5c89fda9fa133d7d561a1f9" alt="Logo IFC">
+                <div class="header-text">
+                    <h1>IFC</h1>
+                    <p>Ikhsan Fried Chicken</p>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">Paket Hemat & Spesial</div>
+                <div class="menu-item">
+                    <div class="details">
+                        <h3>IFC Paket Hemat</h3>
+                        <p>1 Ayam + Nasi + Sambal</p>
+                    </div>
+                    <div class="right-content">
+                        <span class="price">Rp 20.000</span>
+                        <button class="order-btn" onclick="addToCart('IFC Paket Hemat', 20000)">+ Pesan</button>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="details">
+                        <h3>IFC Paket 1</h3>
+                        <p>2 Ayam + Nasi + Minum</p>
+                    </div>
+                    <div class="right-content">
+                        <span class="price">Rp 30.000</span>
+                        <button class="order-btn" onclick="addToCart('IFC Paket 1', 30000)">+ Pesan</button>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="details">
+                        <h3>IFC Paket 2</h3>
+                        <p>Ayam Krispi + Burger + French Fries</p>
+                    </div>
+                    <div class="right-content">
+                        <span class="price">Rp 35.000</span>
+                        <button class="order-btn" onclick="addToCart('IFC Paket 2', 35000)">+ Pesan</button>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="details">
+                        <h3>IFC Paket 3</h3>
+                        <p>Paket Keluarga (4 Ayam + 4 Nasi)</p>
+                    </div>
+                    <div class="right-content">
+                        <span class="price">Rp 65.000</span>
+                        <button class="order-btn" onclick="addToCart('IFC Paket 3', 65000)">+ Pesan</button>
+                    </div>
+                </div>
+
+                <div class="menu-title">A la Carte</div>
+                <div class="menu-item">
+                    <div class="details">
+                        <h3>IFC Burger</h3>
+                        <p>Burger daging ayam krispi spesial</p>
+                    </div>
+                    <div class="right-content">
+                        <span class="price">Rp 15.000</span>
+                        <button class="order-btn" onclick="addToCart('IFC Burger', 15000)">+ Pesan</button>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="details">
+                        <h3>IFC French Fries</h3>
+                        <p>Kentang goreng renyah</p>
+                    </div>
+                    <div class="right-content">
+                        <span class="price">Rp 12.000</span>
+                        <button class="order-btn" onclick="addToCart('IFC French Fries', 12000)">+ Pesan</button>
+                    </div>
+                </div>
+
+                <div class="menu-title">Minuman</div>
+                <div class="menu-item">
+                    <div class="details">
+                        <h3>Es Teh Manis</h3>
+                        <p>Segar dingin</p>
+                    </div>
+                    <div class="right-content">
+                        <span class="price">Rp 5.000</span>
+                        <button class="order-btn" onclick="addToCart('Es Teh Manis', 5000)">+ Pesan</button>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="details">
+                        <h3>Soft Drink (Coca-Cola)</h3>
+                        <p>Soda dingin kaleng</p>
+                    </div>
+                    <div class="right-content">
+                        <span class="price">Rp 8.000</span>
+                        <button class="order-btn" onclick="addToCart('Soft Drink', 8000)">+ Pesan</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cartFooter" class="cart-footer" onclick="goToCheckout()">
+                <span id="cartItems">0 Item dipilih</span>
+                <span style="font-weight:bold; font-size:18px;" id="cartTotal">Rp 0</span>
+            </div>
+        </div>
+
+        <!-- HALAMAN 2: CHECKOUT (PILIH METODE) -->
+        <div id="checkoutView" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="showView('menuView')">‹ Kembali</button>
+            </div>
+
+            <div class="payment-section">
+                <h2 style="color:#000428; margin-top:0;">Detail Pesanan</h2>
+                <div id="orderSummary" class="summary-box"></div>
+
+                <h2 style="color:#000428;">Pilih Metode Pembayaran</h2>
+                <div class="payment-methods">
+                    <div class="payment-option selected" onclick="selectPayment(this, 'QRIS', 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/QRIS_logo.svg/1200px-QRIS_logo.svg.png')">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/QRIS_logo.svg/1200px-QRIS_logo.svg.png" alt="QRIS">
+                    </div>
+                    <div class="payment-option" onclick="selectPayment(this, 'DANA', 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/DANA_Logo.svg/1200px-DANA_Logo.svg.png')">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/DANA_Logo.svg/1200px-DANA_Logo.svg.png" alt="DANA">
+                    </div>
+                    <div class="payment-option" onclick="selectPayment(this, 'GoPay', 'https://assets.jify.co/ui/assets/images/gopay-logo.png')">
+                        <img src="https://assets.jify.co/ui/assets/images/gopay-logo.png" alt="GoPay">
+                    </div>
+                    <div class="payment-option" onclick="selectPayment(this, 'Debit/ATM', 'https://cdn-icons-png.flaticon.com/512/2694/2694619.png')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2694/2694619.png" alt="Debit/ATM" style="width: 50px;">
+                    </div>
+                </div>
+
+                <button class="pay-btn" onclick="processPayment()">Lanjut ke Pembayaran</button>
+            </div>
+        </div>
+
+        <!-- HALAMAN 3: PROSES PEMBAYARAN (QR / VA) -->
+        <div id="processView" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="showView('checkoutView')">‹ Kembali</button>
+            </div>
+            
+            <div class="process-section">
+                <img id="processLogo" class="process-logo" src="" alt="Logo">
+                <h3 id="processTitle" style="color:#000428; margin:0;">Instruksi Pembayaran</h3>
+                
+                <div class="timer">⏳ Selesaikan dalam: <span id="countdown">15:00</span></div>
+                
+                <p style="color:#666; margin:5px 0;">Total Tagihan</p>
+                <h2 id="processTotal" style="color:#000428; margin:5px 0 15px 0;">Rp 0</h2>
+
+                <!-- Wadah untuk QRIS / E-Wallet -->
+                <div id="qrContainer" class="qr-box" style="display:none;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=IFC-Order-Payment" alt="QR Code">
+                    <p style="font-size:12px; color:#666; margin:10px 0 0 0;">Scan QR Code di atas menggunakan aplikasi Anda</p>
+                </div>
+
+                <!-- Wadah untuk Debit / VA -->
+                <div id="vaContainer" class="va-box" style="display:none;">
+                    <p style="margin:0; font-size:12px; color:#666;">Nomor Virtual Account (VA)</p>
+                    <div class="va-number" id="vaNumber">8801-2345-6789</div>
+                    <button class="copy-btn" onclick="copyVA()">Salin Nomor</button>
+                </div>
+
+                <button class="pay-btn" style="margin-top:auto;" onclick="checkPaymentStatus()">Saya Sudah Bayar</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast">Pesanan ditambahkan!</div>
+
+    <script>
+        let cart = [];
+        let selectedPayment = "QRIS";
+        let selectedLogo = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/QRIS_logo.svg/1200px-QRIS_logo.svg.png";
+        let timerInterval;
+
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateCartUI();
+            showToast(name + " ditambahkan!");
+        }
+
+        function updateCartUI() {
+            let totalItems = cart.length;
+            let totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById("cartItems").innerText = totalItems + " Item dipilih";
+            document.getElementById("cartTotal").innerText = "Rp " + totalPrice.toLocaleString('id-ID');
+            let footer = document.getElementById("cartFooter");
+            if (totalItems > 0) { footer.classList.add("show"); } else { footer.classList.remove("show"); }
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if (viewId !== 'processView') {
+                clearInterval(timerInterval);
+            }
+        }
+
+        function goToCheckout() {
+            if (cart.length === 0) return;
+            let summaryBox = document.getElementById("orderSummary");
+            let html = "";
+            let total = 0;
+            cart.forEach(item => {
+                html += `<div class="summary-item"><span>${item.name}</span><span>Rp ${item.price.toLocaleString('id-ID')}</span></div>`;
+                total += item.price;
+            });
+            html += `<div class="summary-total"><span>Total</span><span>Rp ${total.toLocaleString('id-ID')}</span></div>`;
+            summaryBox.innerHTML = html;
+            showView('checkoutView');
+        }
+
+        function selectPayment(element, method, logoUrl) {
+            let options = document.querySelectorAll(".payment-option");
+            options.forEach(opt => opt.classList.remove("selected"));
+            element.classList.add("selected");
+            selectedPayment = method;
+            selectedLogo = logoUrl;
+        }
+
+        function processPayment() {
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById("processTotal").innerText = "Rp " + total.toLocaleString('id-ID');
+            document.getElementById("processLogo").src = selectedLogo;
+            document.getElementById("processTitle").innerText = "Bayar dengan " + selectedPayment;
+
+            let qrContainer = document.getElementById("qrContainer");
+            let vaContainer = document.getElementById("vaContainer");
+
+            // Logika tampilan QRIS / E-Wallet / VA
+            if (selectedPayment === "Debit/ATM") {
+                qrContainer.style.display = "none";
+                vaContainer.style.display = "block";
+                // Generate nomor VA random
+                document.getElementById("vaNumber").innerText = '8801' + Math.floor(100000000 + Math.random() * 900000000);
+            } else {
+                qrContainer.style.display = "block";
+                vaContainer.style.display = "none";
+                // Ganti QR Code sesuai total
+                document.querySelector('#qrContainer img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=IFC-Pay-${total}-${selectedPayment}`;
+            }
+
+            showView('processView');
+            startTimer();
+        }
+
+        function startTimer() {
+            let time = 15 * 60; // 15 menit
+            clearInterval(timerInterval);
+            timerInterval = setInterval(function() {
+                let m = Math.floor(time / 60);
+                let s = time % 60;
+                document.getElementById("countdown").innerText = m + ":" + (s < 10 ? "0" + s : s);
+                time--;
+                if (time < 0) {
+                    clearInterval(timerInterval);
+                    alert("Waktu pembayaran habis!");
+                    showView('menuView');
+                }
+            }, 1000);
+        }
+
+        function checkPaymentStatus() {
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            clearInterval(timerInterval);
+            alert("✅ Pembayaran Diterima!\n\nMetode: " + selectedPayment + "\nTotal: Rp " + total.toLocaleString('id-ID') + "\n\nPesanan Anda sedang diproses. Terima kasih telah memesan di IFC!");
+            cart = [];
+            updateCartUI();
+            showView('menuView');
+        }
+
+        function copyVA() {
+            let vaText = document.getElementById("vaNumber").innerText;
+            navigator.clipboard.writeText(vaText);
+            showToast("Nomor VA Disalin!");
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "toast show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+        }
+    </script>
+</body>
+  </html>
